@@ -1,0 +1,9 @@
+template: "local:vztmpl/ubuntu-26.04-standard_26.04-1_amd64.tar.zst"
+distro: "ubuntu"
+resources:
+  cores: 1
+  memory: 1024
+disk:
+  size: 8
+network:
+  vlan: 10

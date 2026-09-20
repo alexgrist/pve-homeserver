@@ -1,0 +1,5 @@
+pve_endpoint          = "https://proxmox.example.invalid:8006"
+pve_node              = "pve"
+pve_datastore         = "local-lvm"
+
+# Prefer TF_VAR_pve_api_token in the shell instead of storing it here.

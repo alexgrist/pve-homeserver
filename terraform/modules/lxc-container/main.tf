@@ -6,6 +6,12 @@ resource "proxmox_virtual_environment_container" "this" {
   node_name = var.pve.node
   vm_id     = var.id
 
+  # newer linux distributions require unprivileged user namespaces
+  unprivileged = true
+  features {
+    nesting = true
+  }
+
   wait_for_ip {
     ipv4 = true
   }

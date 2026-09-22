@@ -1,0 +1,5 @@
+---
+- name: Restart CouchDB
+  ansible.builtin.service:
+    name: couchdb
+    state: restarted

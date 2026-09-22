@@ -1,0 +1,81 @@
+---
+- name: Require a vaulted CouchDB administrator password
+  ansible.builtin.assert:
+    that:
+      - couchdb_admin_password | length > 0
+      - couchdb_admin_password != 'change-me-with-ansible-vault'
+    fail_msg: Set couchdb_admin_password in an Ansible Vault variable before deploying CouchDB.
+
+- name: Ensure debconf-utils is installed
+  ansible.builtin.apt:
+    name:
+      - debconf
+      - debconf-utils
+    state: present
+    update_cache: true
+
+- name: Add CouchDB repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.asc] https://apache.jfrog.io/artifactory/couchdb-deb/ {{ ansible_distribution_release }} main"
+    state: present
+    filename: couchdb
+    update_cache: true
+
+- name: Preseed CouchDB setup
+  ansible.builtin.debconf:
+    name: couchdb
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  loop:
+    - { question: "couchdb/couchdb/mode", value: "standalone", vtype: "select" }
+    - { question: "couchdb/couchdb/nodename", value: "couchdb@localhost", vtype: "string" }
+    - { question: "couchdb/couchdb/bindaddress", value: "{{ couchdb_bind_address }}", vtype: "string" }
+    - { question: "couchdb/couchdb/adminpass", value: "{{ couchdb_admin_password }}", vtype: "password" }
+    - { question: "couchdb/couchdb/adminpass_again", value: "{{ couchdb_admin_password }}", vtype: "password" }
+  no_log: true
+
+- name: Install CouchDB
+  ansible.builtin.apt:
+    name:
+      - couchdb
+    state: present
+    update_cache: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Ensure CouchDB data directory exists
+  ansible.builtin.file:
+    path: "{{ couchdb_data_directory }}"
+    state: directory
+    owner: couchdb
+    group: couchdb
+    mode: "0750"
+
+- name: Configure CouchDB listener
+  ansible.builtin.ini_file:
+    path: /opt/couchdb/etc/local.ini
+    section: httpd
+    option: bind_address
+    value: "{{ couchdb_bind_address }}"
+    owner: couchdb
+    group: couchdb
+    mode: "0640"
+  notify: Restart CouchDB
+
+- name: Configure CouchDB data path
+  ansible.builtin.ini_file:
+    path: /opt/couchdb/etc/local.ini
+    section: couchdb
+    option: database_dir
+    value: "{{ couchdb_data_directory }}"
+    owner: couchdb
+    group: couchdb
+    mode: "0640"
+  notify: Restart CouchDB
+
+- name: Ensure CouchDB is enabled and running
+  ansible.builtin.service:
+    name: couchdb
+    enabled: true
+    state: started

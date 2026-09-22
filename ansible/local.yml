@@ -5,17 +5,38 @@
 
   vars:
     host_role_name: "{{ ansible_facts.hostname }}"
+    host_role_dir: "{{ playbook_dir }}/roles/{{ host_role_name }}"
+    host_role_strict: true
+
+  pre_tasks:
+    - name: Check for host-specific role
+      ansible.builtin.stat:
+        path: "{{ host_role_dir }}/tasks/main.yml"
+      register: host_role_stat
+      tags: [always, host_role]
+
+    - name: Fail if strict and role missing
+      ansible.builtin.fail:
+        msg: "No role for {{ host_role_name }} in {{ playbook_dir }}/roles/"
+      when:
+        - host_role_strict | bool
+        - not host_role_stat.stat.exists
+      tags: [always, host_role]
+
+    - name: Audit selection
+      ansible.builtin.debug:
+        msg: "host={{ host_role_name }} role_found={{ host_role_stat.stat.exists }}"
+      tags: [always, audit]
 
   roles:
-    - common
+    - role: common
+      tags: [common]
 
   tasks:
-    - name: Check if host-specific role exists
-      ansible.builtin.stat:
-        path: "{{ role_path }}"
-      register: host_role
-
-    - name: Apply host-specific role if it exists
+    - name: Apply host-specific role
       ansible.builtin.include_role:
         name: "{{ host_role_name }}"
-      when: (lookup('ansible.builtin.fileglob', playbook_dir + '/roles/' + host_role_name) | length > 0)
+        apply:
+          tags: [host_role]
+      when: host_role_stat.stat.exists
+      tags: [host_role]

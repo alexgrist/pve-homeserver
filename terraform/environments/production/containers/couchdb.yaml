@@ -1,5 +1,5 @@
-template: "local:vztmpl/ubuntu-26.04-standard_26.04-1_amd64.tar.zst"
-distro: "ubuntu"
+template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+distro: "debian"
 resources:
   cores: 1
   memory: 1024

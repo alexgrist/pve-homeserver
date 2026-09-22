@@ -1,4 +1,8 @@
 locals {
+  deploy_public_key = trimspace(
+    file("${path.root}/../../keys/deploy.pub")
+  )
+
   # parse container yml definitions
   containers = {
     for filepath in fileset("${path.module}/containers", "*.yaml") :
@@ -27,6 +31,7 @@ module "lxc" {
     datastore = var.pve_datastore
   }
 
+  ssh_key   = local.deploy_public_key
   hostname  = each.key
   tags      = each.value.tags
   template  = each.value.template

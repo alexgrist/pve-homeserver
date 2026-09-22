@@ -24,6 +24,10 @@ resource "proxmox_virtual_environment_container" "this" {
         address = "dhcp"
       }
     }
+
+    user_account {
+      keys = [var.ssh_key]
+    }
   }
 
   disk {

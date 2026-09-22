@@ -34,6 +34,12 @@ variable "hostname" {
   type        = string
 }
 
+variable "ssh_key" {
+  description = "The SSH public key used to access the container"
+  type        = string
+  sensitive   = true
+}
+
 variable "template" {
   description = "The template to use for the container"
   type        = string

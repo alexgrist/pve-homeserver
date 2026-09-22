@@ -34,7 +34,7 @@ resource "terraform_data" "ansible_bootstrap" {
 
   provisioner "file" {
     content     = var.vault_password
-    destination = "/etc/ansible/vault-pass"
+    destination = "/etc/ansible/.vault-pass"
   }
 
   provisioner "file" {
@@ -51,7 +51,7 @@ resource "terraform_data" "ansible_bootstrap" {
 
   provisioner "remote-exec" {
     inline = [
-      "chmod 600 /etc/ansible/vault-pass",
+      "chmod 600 /etc/ansible/.vault-pass",
       "systemctl daemon-reload",
       "systemctl enable ansible-pull.timer",
       "systemctl start ansible-pull.timer",

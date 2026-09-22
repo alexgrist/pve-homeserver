@@ -1,7 +1,11 @@
+
 locals {
+  vault_password     = ephemeral.onepassword_item.vault_password.password
+  deploy_private_key = ephemeral.onepassword_item.deploy_key.private_key
   deploy_public_key = trimspace(
     file("${path.root}/../../keys/deploy.pub")
   )
+  git_deploy_key_private = ephemeral.onepassword_item.git_deploy_key.private_key
 
   # parse container yml definitions
   containers = {
@@ -40,3 +44,17 @@ module "lxc" {
   disk      = each.value.disk
   network   = each.value.network
 }
+
+module "ansible" {
+  source   = "../../modules/ansible-bootstrap"
+  for_each = local.containers
+
+  container_id = module.lxc[each.key].container_id
+  container_ip = module.lxc[each.key].container_ip
+
+  ssh_private_key        = local.deploy_private_key
+  git_deploy_private_key = local.git_deploy_key_private
+  git_repo_url           = var.git_repo_url
+  vault_password         = local.vault_password
+}
+

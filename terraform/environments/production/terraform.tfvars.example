@@ -1,3 +1,4 @@
 pve_endpoint          = "https://proxmox.example.invalid:8006"
 pve_node              = "pve"
 pve_datastore         = "local-lvm"
+git_repo_url          = "https://github.com/alexgrist/pve-homeserver.git"

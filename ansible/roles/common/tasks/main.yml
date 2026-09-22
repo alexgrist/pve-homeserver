@@ -10,3 +10,29 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Configure root autologin for PVE console
+  block:
+    - name: Create getty override directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/container-getty@1.service.d
+        state: directory
+        mode: "0755"
+
+    - name: Configure getty to automatically login root
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/container-getty@1.service.d/override.conf
+        mode: "0644"
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=-/sbin/agetty --autologin root --noclear --keep-baud tty%I 115200,38400,9600 $TERM
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Restart container getty
+      ansible.builtin.systemd:
+        name: container-getty@1.service
+        state: restarted

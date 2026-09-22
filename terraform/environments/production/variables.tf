@@ -2,7 +2,6 @@
 variable "pve_endpoint" {
   description = "Proxmox API endpoint URL (e.g., https://192.168.1.100:8006/)"
   type        = string
-  sensitive   = true
 }
 
 variable "pve_node" {

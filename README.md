@@ -1,25 +1,29 @@
 # pve-homeserver
 
-Terraform configs for my Proxmox homelab. Deploys LXCs using the bpg/proxmox provider.
+Terraform + Ansible for my Proxmox homelab. Terraform creates the LXCs, Ansible configures them.
 
 ## Prerequisites:
 
 - Proxmox VE 8.4+ with API access
 - OpenTofu >= 1.12
-- Proxmox API token with container creation permissions
-- LXC template (e.g., Debian 12, Ubuntu 24.04)
+- 1Password CLI
+- Proxmox API token with container creation permissions, stored as `PROXMOX_VE_API_TOKEN` in your shell
 
 ## Usage
 
-1. Create `terraform.tfvars` with proxmox API settings.
-2. Run: `terraform init && terraform validate && terraform plan`
-3. Check the plan output (or output to a file with `-out planout`)
-4. Apply with `terraform apply` (with `planout` if using file output)
+1. Copy `terraform.tfvars.example` to `terraform.tfvars` and fill it in.
+2. `terraform init && terraform validate && terraform plan -out planout`
+3. Review the plan, then `terraform apply planout`.
 
-## Example `terraform.tfvars`
-```hcl
-pve_endpoint  = "https://10.0.0.1:8006"
-pve_api_token = "token-id!secret"
-pve_node      = "pve"
-pve_datastore = "local-lvm"
+Set the Proxmox token in your current session — the bpg/proxmox provider reads it from the environment, so it never touches a `.tfvars` file or Terraform state:
+
+```powershell
+$env:PROXMOX_VE_API_TOKEN = "<token-id>!<secret>"
 ```
+
+Local state is the default. Backblaze B2 settings are provided through the ignored `backend-b2.hcl` file; credentials come from environment variables or a secret manager (1Password).
+
+## Container definitions
+
+Each container is defined as a YAML file under `terraform/environments/production/containers`.
+The playbook in `local.yml` applies a `common` role to every host and then a role named after the hostname, so each container gets its own config on top of the shared baseline.

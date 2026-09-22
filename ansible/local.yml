@@ -1,0 +1,21 @@
+- hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+
+  vars:
+    host_role_name: "{{ ansible_facts.hostname }}"
+
+  roles:
+    - common
+
+  tasks:
+    - name: Check if host-specific role exists
+      ansible.builtin.stat:
+        path: "{{ role_path }}"
+      register: host_role
+
+    - name: Apply host-specific role if it exists
+      ansible.builtin.include_role:
+        name: "{{ host_role_name }}"
+      when: (lookup('ansible.builtin.fileglob', playbook_dir + '/roles/' + host_role_name) | length > 0)

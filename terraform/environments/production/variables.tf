@@ -4,13 +4,6 @@ variable "pve_endpoint" {
   sensitive   = true
 }
 
-variable "pve_api_token" {
-  description = "Proxmox API token for authentication"
-  type        = string
-  sensitive   = true
-  ephemeral   = true
-}
-
 variable "pve_node" {
   description = "Proxmox node name"
   type        = string

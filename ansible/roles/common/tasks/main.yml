@@ -1,0 +1,12 @@
+---
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - apt-transport-https
+      - gnupg
+      - curl
+      - git
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

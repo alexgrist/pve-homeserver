@@ -51,11 +51,6 @@ resource "proxmox_virtual_environment_container" "this" {
     type             = var.distro
   }
 
-  console {
-    enabled = true
-    type    = "shell"
-  }
-
   lifecycle {
     precondition {
       condition     = var.template != null && var.template != ""

@@ -36,3 +36,24 @@
       ansible.builtin.systemd:
         name: container-getty@1.service
         state: restarted
+
+- name: Install managed-host MOTD script
+  ansible.builtin.copy:
+    dest: /etc/profile.d/homelab-motd.sh
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      host_name="$(hostname --short 2>/dev/null || hostname)"
+      os_name="$(. /etc/os-release 2>/dev/null && printf '%s' "${PRETTY_NAME:-Linux}" || printf '%s' Linux)"
+      kernel="$(uname -r 2>/dev/null || printf '%s' unknown)"
+      addresses="$(hostname -I 2>/dev/null | xargs)"
+      uptime="$(uptime -p 2>/dev/null || uptime 2>/dev/null || printf '%s' unknown)"
+
+      printf '\n'
+      printf '  %s\n' "${host_name}"
+      printf '  --------------------------------\n'
+      printf '  OS:       %s\n' "${os_name}"
+      printf '  Kernel:   %s\n' "${kernel}"
+      printf '  Address:  %s\n' "${addresses:-none}"
+      printf '  Uptime:   %s\n' "${uptime}"
+      printf '\n'

@@ -42,7 +42,7 @@
 - name: Install CouchDB
   ansible.builtin.apt:
     name:
-      - couchdb
+      - "{{ couchdb_package }}"
     state: present
     update_cache: true
   environment:

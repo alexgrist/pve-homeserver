@@ -11,51 +11,44 @@ resource "terraform_data" "ansible_bootstrap" {
     private_key = var.ssh_private_key
   }
 
+  # private key used for ansible-pull to clone the git repo
   provisioner "file" {
     content     = var.git_deploy_private_key
-    destination = "/root/.ssh/id_rsa"
+    destination = "/tmp/git_deploy_key"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "chmod 0600 /root/.ssh/id_rsa",
-      "ssh-keyscan -H github.com > /root/.ssh/known_hosts",
-      "chmod 0644 /root/.ssh/known_hosts",
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "apt-get update",
-      "apt-get install -y git ansible",
-      "mkdir -p /etc/ansible",
-    ]
-  }
-
+  # ansible vault password used to encrypt/decrypt secrets
   provisioner "file" {
     content     = var.vault_password
-    destination = "/etc/ansible/.vault-pass"
+    destination = "/tmp/ansible_vault_pass"
   }
 
+  # service unit file for ansible-pull
   provisioner "file" {
     content = templatefile("${path.module}/templates/ansible-pull.service.tpl", {
       git_repo_url = var.git_repo_url
     })
-    destination = "/etc/systemd/system/ansible-pull.service"
+    destination = "/tmp/ansible-pull.service"
   }
 
+  # timer unit file for ansible-pull
   provisioner "file" {
     content     = file("${path.module}/templates/ansible-pull.timer")
-    destination = "/etc/systemd/system/ansible-pull.timer"
+    destination = "/tmp/ansible-pull.timer"
+  }
+
+  # bootstrap script to install ansible and configure ansible-pull service
+  provisioner "file" {
+    content     = file("${path.module}/files/bootstrap-ansible.sh")
+    destination = "/tmp/bootstrap-ansible.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod 600 /etc/ansible/.vault-pass",
-      "systemctl daemon-reload",
-      "systemctl enable ansible-pull.timer",
-      "systemctl start ansible-pull.timer",
-      "systemctl start ansible-pull.service"
+      "chmod 0700 /tmp/bootstrap-ansible.sh",
+      "sed -i 's/\\r$//' /tmp/bootstrap-ansible.sh",
+      "/bin/bash /tmp/bootstrap-ansible.sh",
+      "rm -f /tmp/bootstrap-ansible.sh",
     ]
   }
 }

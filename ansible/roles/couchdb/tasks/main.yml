@@ -15,11 +15,15 @@
     update_cache: true
 
 - name: Add CouchDB repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.asc] https://apache.jfrog.io/artifactory/couchdb-deb/ {{ ansible_distribution_release }} main"
+  ansible.builtin.deb822_repository:
+    name: couchdb
+    types: [deb]
+    uris: https://apache.jfrog.io/artifactory/couchdb-deb/
+    suites: "{{ ansible_facts.distribution_release }}"
+    components: [main]
+    signed_by: https://couchdb.apache.org/repo/keys.asc
     state: present
-    filename: couchdb
-    update_cache: true
+  register: couchdb_repo
 
 - name: Preseed CouchDB setup
   ansible.builtin.debconf:

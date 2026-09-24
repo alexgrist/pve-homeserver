@@ -56,17 +56,6 @@
     group: couchdb
     mode: "0750"
 
-- name: Configure CouchDB listener
-  ansible.builtin.ini_file:
-    path: /opt/couchdb/etc/local.ini
-    section: httpd
-    option: bind_address
-    value: "{{ couchdb_bind_address }}"
-    owner: couchdb
-    group: couchdb
-    mode: "0640"
-  notify: Restart CouchDB
-
 - name: Configure CouchDB data path
   ansible.builtin.ini_file:
     path: /opt/couchdb/etc/local.ini

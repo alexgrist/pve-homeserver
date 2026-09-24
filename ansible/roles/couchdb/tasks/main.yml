@@ -32,11 +32,11 @@
     value: "{{ item.value }}"
     vtype: "{{ item.vtype }}"
   loop:
-    - { question: "couchdb/couchdb/mode", value: "standalone", vtype: "select" }
-    - { question: "couchdb/couchdb/nodename", value: "couchdb@localhost", vtype: "string" }
-    - { question: "couchdb/couchdb/bindaddress", value: "{{ couchdb_bind_address }}", vtype: "string" }
-    - { question: "couchdb/couchdb/adminpass", value: "{{ couchdb_admin_password }}", vtype: "password" }
-    - { question: "couchdb/couchdb/adminpass_again", value: "{{ couchdb_admin_password }}", vtype: "password" }
+    - { question: "couchdb/mode", value: "standalone", vtype: "select" }
+    - { question: "couchdb/bindaddress", value: "{{ couchdb_bind_address }}", vtype: "string" }
+    - { question: "couchdb/adminpass", value: "{{ couchdb_admin_password }}", vtype: "password" }
+    - { question: "couchdb/adminpass_again", value: "{{ couchdb_admin_password }}", vtype: "password" }
+    - { question: "couchdb/cookie", value: "{{ couchdb_cookie }}", vtype: "string" }
   no_log: true
 
 - name: Install CouchDB

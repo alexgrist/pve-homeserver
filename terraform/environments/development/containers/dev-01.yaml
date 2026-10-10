@@ -1,0 +1,12 @@
+id: 9999
+tags:
+  - "dev"
+template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+distro: "debian"
+resources:
+  cores: 1
+  memory: 1024
+disk:
+  size: 8
+network:
+  vlan: 10

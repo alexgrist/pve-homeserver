@@ -1,4 +1,4 @@
-### Windows
+
 # Windows thumbnail cache files
 Thumbs.db
 
@@ -24,3 +24,8 @@ $RECYCLE.BIN/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local

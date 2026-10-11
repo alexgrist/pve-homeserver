@@ -1,5 +1,6 @@
 ---
-- hosts: proxmox_all_lxc
+- name: Apply roles for all LXC containers
+  hosts: proxmox_all_lxc
   gather_facts: true
   become: false
 
@@ -10,11 +11,10 @@
           - ansible_connection == 'community.proxmox.proxmox_pct_remote'
         fail_msg: "Not connected via pct. Refusing {{ inventory_hostname }}."
 
-  tasks:
-    - name: Apply common base setup
-      roles:
-        - role: common
+  roles:
+    - role: common
 
+  tasks:
     - name: Check if roles exist for the given Proxmox tags
       ansible.builtin.stat:
         path: "{{ playbook_dir }}/../roles/{{ proxmox_tag }}"

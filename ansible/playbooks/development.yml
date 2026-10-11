@@ -1,5 +1,6 @@
 ---
-- hosts: dev-01
+- name: Apply development roles for testing
+  hosts: dev-01
   gather_facts: true
   become: false
 

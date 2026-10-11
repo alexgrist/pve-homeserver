@@ -26,6 +26,9 @@
     update_cache: false
 
 - name: Configure root autologin for PVE console
+  when:
+    - ansible_facts['virtualization_type'] == 'lxc'
+    - ansible_facts['virtualization_role'] == 'guest'
   block:
     - name: Create getty override directory
       ansible.builtin.file:
@@ -50,9 +53,6 @@
       ansible.builtin.systemd:
         name: container-getty@1.service
         state: restarted
-  when:
-    - ansible_facts['virtualization_type'] == 'lxc'
-    - ansible_facts['virtualization_role'] == 'guest'
 
 - name: Install managed-host MOTD script
   ansible.builtin.copy:

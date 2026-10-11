@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Apply development roles for testing
+  hosts: localhost
   gather_facts: true
   become: false
 

@@ -1,0 +1,20 @@
+services:
+  ansible:
+    build:
+      context: ./ansible
+      dockerfile: Dockerfile
+    environment:
+      - ANSIBLE_CONFIG=/data/ansible.cfg
+      - ANSIBLE_DEBUG=True
+
+      - PROXMOX_SSH_USER
+      - PROXMOX_SSH_PASSWORD
+
+      - PROXMOX_URL # required for API connection
+      - PROXMOX_HOST
+      - PROXMOX_USER
+      - PROXMOX_PASSWORD
+      - PROXMOX_TOKEN_ID
+      - PROXMOX_TOKEN_SECRET
+    volumes:
+      - ./ansible:/data:ro

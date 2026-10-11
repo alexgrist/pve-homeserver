@@ -1,0 +1,20 @@
+plugin: community.proxmox.proxmox
+
+want_facts: true
+exclude_nodes: true
+
+# Automatically build host groups based on Proxmox tags
+keyed_groups:
+  - key: proxmox_tags
+    prefix: ""
+    separator: ""
+
+# Filter hosts belonging to dev
+filters:
+  - proxmox_vmtype == "lxc"
+  - "'dev' not in proxmox_tags"
+
+compose:
+  ansible_connection: "'community.proxmox.proxmox_pct_remote'"
+  ansible_proxmox_node: proxmox_node
+  ansible_proxmox_vmid: proxmox_vmid

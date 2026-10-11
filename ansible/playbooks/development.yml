@@ -1,0 +1,39 @@
+---
+- name: Apply development roles for testing
+  hosts: dev-01
+  gather_facts: true
+  become: false
+
+  vars:
+    # dummy Proxmox tags to test dynamic role loading locally
+    proxmox_tags:
+      - common
+      - couchdb
+
+  pre_tasks:
+    - name: Ensure execution through pct into an LXC
+      ansible.builtin.assert:
+        that:
+          - ansible_connection == 'community.proxmox.proxmox_pct_remote'
+        fail_msg: "Not connected via pct. Refusing {{ inventory_hostname }}."
+
+  tasks:
+    - name: Verify execution context
+      ansible.builtin.debug:
+        msg: "Role execution context: {{ ansible_facts.hostname }}"
+
+    - name: Check if roles exist for the given Proxmox tags
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../roles/{{ proxmox_tag }}"
+      loop: "{{ proxmox_tags }}"
+      loop_control:
+        loop_var: proxmox_tag
+      register: role_stats
+
+    - name: Dynamically include roles matching tags
+      ansible.builtin.include_role:
+        name: "{{ role_stat.proxmox_tag }}"
+      loop: "{{ role_stats.results }}"
+      loop_control:
+        loop_var: role_stat
+        label: "{{ role_stat.proxmox_tag }}"

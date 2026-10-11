@@ -57,7 +57,7 @@
     mode: "0750"
 
 - name: Configure CouchDB data path
-  ansible.builtin.ini_file:
+  community.general.ini_file:
     path: /opt/couchdb/etc/local.ini
     section: couchdb
     option: database_dir

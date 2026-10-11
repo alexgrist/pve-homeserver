@@ -18,3 +18,13 @@ services:
       PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET}
     volumes:
       - ./ansible:/data:ro
+
+  tofu:
+    build:
+      context: ./terraform
+      dockerfile: Dockerfile
+    environment:
+      PROXMOX_VE_ENDPOINT: ${PROXMOX_URL}
+      PROXMOX_VE_API_TOKEN: ${PROXMOX_TOKEN_ID}=${PROXMOX_TOKEN_SECRET}
+    volumes:
+      - ./terraform:/workspace:ro

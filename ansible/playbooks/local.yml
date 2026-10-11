@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: false
+
+  vars:
+    # dummy Proxmox tags to test dynamic role loading locally
+    proxmox_tags:
+      - common
+      - couchdb
+
+  tasks:
+    - name: Check if roles exist for the given Proxmox tags
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../roles/{{ proxmox_tag }}"
+      loop: "{{ proxmox_tags }}"
+      loop_control:
+        loop_var: proxmox_tag
+      register: role_stats
+
+    - name: Dynamically include roles matching tags
+      ansible.builtin.include_role:
+        name: "{{ role_stat.proxmox_tag }}"
+      loop: "{{ role_stats.results }}"
+      loop_control:
+        loop_var: role_stat
+        label: "{{ role_stat.proxmox_tag }}"

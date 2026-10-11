@@ -27,4 +27,4 @@ services:
       PROXMOX_VE_ENDPOINT: ${PROXMOX_URL}
       PROXMOX_VE_API_TOKEN: ${PROXMOX_TOKEN_ID}=${PROXMOX_TOKEN_SECRET}
     volumes:
-      - ./terraform:/workspace:ro
+      - ./terraform:/workspace

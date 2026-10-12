@@ -7,6 +7,7 @@ COPY --from=tofu /usr/local/bin/tofu /usr/local/bin/tofu
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
+    ca-certificates \
     git \
     curl && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man && \

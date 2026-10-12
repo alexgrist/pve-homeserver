@@ -16,12 +16,6 @@ variable "pve_datastore" {
   default     = "local-lvm"
 }
 
-variable "git_repo_url" {
-  type        = string
-  description = "Git repository HTTPS/SSH URL that ansible-pull continuously syncs against"
-  sensitive   = true
-}
-
 variable "op_vault" {
   description = "1Password vault name where secrets are stored"
   type        = string

@@ -1,6 +1,5 @@
 
 locals {
-  admin_private_key = ephemeral.onepassword_item.admin_key.private_key
   admin_public_key = trimspace(
     file("${path.root}/keys/admin.pub")
   )

@@ -1,5 +1,0 @@
----
-# SSH connection variables are different from the Proxmox API connection
-ansible_host: "{{ lookup('env', 'PROXMOX_HOST') }}"
-ansible_user: "{{ lookup('env', 'PROXMOX_SSH_USER') }}"
-ansible_password: "{{ lookup('env', 'PROXMOX_SSH_PASSWORD') }}"

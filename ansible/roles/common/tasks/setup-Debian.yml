@@ -17,13 +17,10 @@
 - name: Install baseline packages
   ansible.builtin.apt:
     name:
-      - ca-certificates
       - apt-transport-https
-      - gnupg
-      - curl
-      - git
+      - python3-debian
+      - gnupg2
     state: present
-    update_cache: false
 
 - name: Configure root autologin for PVE console
   when:

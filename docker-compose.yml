@@ -4,7 +4,7 @@ services:
       context: ./ansible
       dockerfile: Dockerfile
     environment:
-      ANSIBLE_CONFIG: ${ANSIBLE_CONFIG:-/data/ansible.cfg}
+      ANSIBLE_CONFIG: ${ANSIBLE_CONFIG:-/workspace/ansible.cfg}
       ANSIBLE_VAULT_PASSWORD: ${ANSIBLE_VAULT_PASSWORD}
 
       PROXMOX_SSH_USER: ${PROXMOX_SSH_USER:-root}
@@ -17,7 +17,7 @@ services:
       PROXMOX_TOKEN_ID: ${PROXMOX_TOKEN_ID}
       PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET:-}
     volumes:
-      - ./ansible:/data:ro
+      - ./ansible:/workspace:ro
 
   tofu:
     build:

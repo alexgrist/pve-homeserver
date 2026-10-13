@@ -5,14 +5,14 @@ exclude_nodes: true
 
 # Automatically build host groups based on Proxmox tags
 keyed_groups:
-  - key: proxmox_tags
+  - key: proxmox_tags_parsed
     prefix: ""
     separator: ""
 
 # Filter hosts belonging to dev
 filters:
   - proxmox_vmtype == "lxc"
-  - "'dev' in proxmox_tags"
+  - "'dev' in proxmox_tags_parsed"
 
 compose:
   ansible_connection: "'community.proxmox.proxmox_pct_remote'"

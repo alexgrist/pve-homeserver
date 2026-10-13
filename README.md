@@ -1,29 +1,53 @@
 # pve-homeserver
 
-Terraform + Ansible for my Proxmox homelab. Terraform creates the LXCs, Ansible configures them.
+Terraform + Ansible for my Proxmox homelab. Terraform creates the LXC containers, Ansible configures them.
 
 ## Prerequisites:
 
 - Proxmox VE 8.4+ with API access
-- OpenTofu >= 1.12
+- Docker Compose
 - 1Password CLI
-- Proxmox API token with container creation permissions, stored as `PROXMOX_VE_API_TOKEN` in your shell
+- OpenTofu >= 1.12 (or use tofu container)
+
+## Setup
+
+1. Copy `.env.example` to `.env` and fill with Proxmox connection details or use a 1Password Environment.
+2. Set `OP_SERVICE_ACCOUNT_TOKEN` in the host shell.
+3. Build containers with `docker compose build`.
+
+## Terraform
+
+Two environments live under `terraform/environments/` each with its own state, variables, and container definitions.
+Containers are YAML files under `<environment>/containers`. Ansible roles are applied based on Proxmox tags.
+
+## Ansible
+
+Playbooks live in `ansible/playbooks/`, inventories under `ansible/inventories/`. Hosts are grouped by Proxmox tags, roles matching those tags are applied on top of the shared common role. A container tagged `couchdb` gets the `couchdb` role automatically. The vault password (if provided) is fetched from 1Password at run time.
 
 ## Usage
 
-1. Copy `terraform.tfvars.example` to `terraform.tfvars` and fill it in.
-2. `terraform init && terraform validate && terraform plan -out planout`
-3. Review the plan, then `terraform apply planout`.
-
-Set the Proxmox token in your current session — the bpg/proxmox provider reads it from the environment, so it never touches a `.tfvars` file or Terraform state:
+### Terraform
 
 ```powershell
-$env:PROXMOX_VE_API_TOKEN = "<token-id>!<secret>"
+# initialise the working directory
+op run --environment=<op_env_id> -- docker compose run --rm -e OP_SERVICE_ACCOUNT_TOKEN tofu tofu -chdir=/workspace/environments/development init
+
+# create and save the execution plan
+op run --environment=<op_env_id> -- docker compose run --rm -e OP_SERVICE_ACCOUNT_TOKEN tofu tofu -chdir=/workspace/environments/development plan -out planout
+
+# apply the saved execution plan
+op run --environment=<op_env_id> -- docker compose run --rm -e OP_SERVICE_ACCOUNT_TOKEN tofu tofu -chdir=/workspace/environments/development apply "planout"
 ```
 
-Local state is the default. Backblaze B2 settings are provided through the ignored `backend-b2.hcl` file; credentials come from environment variables or a secret manager (1Password).
+### Ansible
 
-## Container definitions
+```powershell
+# list the development inventory
+op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-inventory -i inventories/development/hosts.proxmox.yml --list
 
-Each container is defined as a YAML file under `terraform/environments/production/containers`.
-The playbook in `local.yml` applies a `common` role to every host and then a role named after the hostname, so each container gets its own config on top of the shared baseline.
+# push the development playbook
+op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-playbook -i inventories/development/hosts.proxmox.yml playbooks/development.yml
+
+# run the local test playbook (in local container)
+op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-playbook -i inventories/development/local.yml playbooks/local.yml
+```

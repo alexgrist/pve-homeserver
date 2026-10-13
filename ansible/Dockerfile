@@ -32,10 +32,10 @@ RUN uv venv /opt/ansible-env && \
 RUN /opt/ansible-env/bin/ansible-galaxy collection install -r /tmp/requirements.yml && \
     rm /tmp/requirements.yml
 
-RUN mkdir -p /data /etc/ansible && \
-    chmod 700 /data
+RUN mkdir -p /workspace /etc/ansible && \
+    chmod 700 /workspace
 
-WORKDIR /data
+WORKDIR /workspace
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD [ "ansible", "--version" ]

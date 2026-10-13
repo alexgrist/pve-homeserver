@@ -1,6 +1,7 @@
 id: 9999
 tags:
-  - "dev"
+  - dev
+  - couchdb
 template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
 distro: "debian"
 resources:

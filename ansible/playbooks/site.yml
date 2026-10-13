@@ -18,7 +18,7 @@
     - name: Check if roles exist for the given Proxmox tags
       ansible.builtin.stat:
         path: "{{ playbook_dir }}/../roles/{{ proxmox_tag }}"
-      loop: "{{ proxmox_tags }}"
+      loop: "{{ proxmox_tags_parsed }}"
       loop_control:
         loop_var: proxmox_tag
       register: role_stats

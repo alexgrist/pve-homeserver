@@ -5,10 +5,9 @@
   become: false
 
   vars:
-    # dummy Proxmox tags to test dynamic role loading locally
+    # Proxmox tags to test dynamic role loading locally
     proxmox_tags:
       - common
-      - couchdb
 
   tasks:
     - name: Check if roles exist for the given Proxmox tags

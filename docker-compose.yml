@@ -4,20 +4,20 @@ services:
       context: ./ansible
       dockerfile: Dockerfile
     environment:
-      ANSIBLE_CONFIG: /data/ansible.cfg
-      ANSIBLE_DEBUG: True
+      ANSIBLE_CONFIG: ${ANSIBLE_CONFIG:-/workspace/ansible.cfg}
+      ANSIBLE_VAULT_PASSWORD: ${ANSIBLE_VAULT_PASSWORD}
 
-      PROXMOX_SSH_USER: ${PROXMOX_SSH_USER}
+      PROXMOX_SSH_USER: ${PROXMOX_SSH_USER:-root}
       PROXMOX_SSH_PASSWORD: ${PROXMOX_SSH_PASSWORD}
 
       PROXMOX_URL: ${PROXMOX_URL} # required for API connection
       PROXMOX_HOST: ${PROXMOX_HOST}
-      PROXMOX_USER: ${PROXMOX_USER}
+      PROXMOX_USER: ${PROXMOX_USER:-root@pam}
       PROXMOX_PASSWORD: ${PROXMOX_PASSWORD}
       PROXMOX_TOKEN_ID: ${PROXMOX_TOKEN_ID}
-      PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET}
+      PROXMOX_TOKEN_SECRET: ${PROXMOX_TOKEN_SECRET:-}
     volumes:
-      - ./ansible:/data:ro
+      - ./ansible:/workspace:ro
 
   tofu:
     build:

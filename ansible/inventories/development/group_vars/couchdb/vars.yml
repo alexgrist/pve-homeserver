@@ -1,0 +1,3 @@
+---
+couchdb_admin_password: "password"
+couchdb_cookie: "cookie123"

@@ -3,3 +3,9 @@
 ansible_host: "{{ lookup('env', 'PROXMOX_HOST') }}"
 ansible_user: "{{ lookup('env', 'PROXMOX_SSH_USER') }}"
 ansible_password: "{{ lookup('env', 'PROXMOX_SSH_PASSWORD') }}"
+
+# Search paths for tag-derived roles, matching ansible.cfg roles_path
+role_search_paths:
+  - "{{ playbook_dir }}/../roles"
+  - /usr/share/ansible/roles
+  - /etc/ansible/roles

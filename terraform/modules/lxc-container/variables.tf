@@ -82,3 +82,37 @@ variable "network" {
   })
   default = {}
 }
+
+variable "mounts" {
+  description = "Additional volumes or host bind mounts exposed inside the container"
+  type = list(object({
+    volume        = string
+    path          = string
+    size          = optional(string)
+    backup        = optional(bool, false)
+    read_only     = optional(bool, false)
+    acl           = optional(bool, false)
+    quota         = optional(bool, false)
+    replicate     = optional(bool, true)
+    shared        = optional(bool, false)
+    mount_options = optional(list(string))
+    idmap         = optional(string)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for mount in var.mounts :
+      length(mount.volume) > 0 && startswith(mount.path, "/")
+    ])
+    error_message = "Each mount requires a non-empty volume and a path that starts with '/'."
+  }
+
+  validation {
+    condition = alltrue([
+      for mount in var.mounts :
+      startswith(mount.volume, "/") ? mount.size == null : true
+    ])
+    error_message = "Bind mounts (absolute host paths) must not set 'size'; it only applies to storage-backed volumes."
+  }
+}

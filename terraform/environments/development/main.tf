@@ -17,6 +17,7 @@ locals {
         resources = null
         disk      = null
         network   = {}
+        mounts    = []
       },
 
       yamldecode(file("${path.module}/containers/${filepath}")),
@@ -42,4 +43,5 @@ module "lxc" {
   resources = each.value.resources
   disk      = each.value.disk
   network   = each.value.network
+  mounts    = each.value.mounts
 }

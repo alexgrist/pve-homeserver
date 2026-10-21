@@ -9,7 +9,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     git \
-    curl && \
+    curl \
+    jq && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man && \
     apt-get clean
 

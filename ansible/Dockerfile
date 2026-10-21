@@ -12,6 +12,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
     python3 \
+    git \
     ca-certificates \
     openssh-client \
     sshpass && \
@@ -29,10 +30,11 @@ RUN uv venv /opt/ansible-env && \
     paramiko \
     requests
 
-RUN /opt/ansible-env/bin/ansible-galaxy collection install -r /tmp/requirements.yml && \
+RUN /opt/ansible-env/bin/ansible-galaxy install -r /tmp/requirements.yml -p /usr/share/ansible/roles && \
+    /opt/ansible-env/bin/ansible-galaxy collection install -r /tmp/requirements.yml && \
     rm /tmp/requirements.yml
 
-RUN mkdir -p /workspace /etc/ansible && \
+RUN mkdir -p /workspace && \
     chmod 700 /workspace
 
 WORKDIR /workspace

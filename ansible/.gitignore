@@ -3,3 +3,6 @@
 
 # Retry files generated for failed Ansible playbook runs
 *.retry
+
+# Ignore external role dependencies
+roles/external/

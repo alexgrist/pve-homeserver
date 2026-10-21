@@ -1,0 +1,5 @@
+.ansible/
+roles/external/
+*.retry
+.git
+**/.git

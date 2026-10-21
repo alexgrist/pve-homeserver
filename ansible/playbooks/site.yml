@@ -15,18 +15,15 @@
     - role: common
 
   tasks:
-    - name: Check if roles exist for the given Proxmox tags
-      ansible.builtin.stat:
-        path: "{{ playbook_dir }}/../roles/{{ proxmox_tag }}"
+    - name: Dynamically include roles matching tags
+      ansible.builtin.include_role:
+        name: "{{ proxmox_tag }}"
       loop: "{{ proxmox_tags_parsed }}"
       loop_control:
         loop_var: proxmox_tag
-      register: role_stats
-
-    - name: Dynamically include roles matching tags
-      ansible.builtin.include_role:
-        name: "{{ role_stat.proxmox_tag }}"
-      loop: "{{ role_stats.results }}"
-      loop_control:
-        loop_var: role_stat
-        label: "{{ role_stat.proxmox_tag }}"
+        label: "{{ proxmox_tag }}"
+      when: >-
+        query('ansible.builtin.first_found',
+          [proxmox_tag ~ '/tasks/main.yml'],
+          paths=role_search_paths,
+          skip=True) | length > 0

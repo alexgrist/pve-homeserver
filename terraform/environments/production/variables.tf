@@ -15,9 +15,3 @@ variable "pve_datastore" {
   type        = string
   default     = "local-lvm"
 }
-
-variable "op_vault" {
-  description = "1Password vault name where secrets are stored"
-  type        = string
-  default     = "Homelab"
-}

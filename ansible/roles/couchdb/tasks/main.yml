@@ -1,10 +1,11 @@
 ---
-- name: Require a vaulted CouchDB administrator password
+- name: Require vaulted CouchDB credentials
   ansible.builtin.assert:
     that:
       - couchdb_admin_password | length > 0
       - couchdb_admin_password != 'change-me-with-ansible-vault'
-    fail_msg: Set couchdb_admin_password in an Ansible Vault variable before deploying CouchDB.
+      - couchdb_cookie | length > 0
+    fail_msg: Set couchdb_admin_password and couchdb_cookie in an Ansible Vault variable before deploying CouchDB.
 
 - name: Ensure debconf-utils is installed
   ansible.builtin.apt:

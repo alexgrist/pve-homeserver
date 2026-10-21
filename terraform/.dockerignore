@@ -1,0 +1,11 @@
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+planout
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+backend-*.hcl
+.git

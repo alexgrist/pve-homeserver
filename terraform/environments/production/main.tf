@@ -10,12 +10,14 @@ locals {
     trimsuffix(filepath, ".yaml") => merge(
       # base structure
       {
+        id        = null
         tags      = []
         template  = null
         distro    = null
         resources = null
         disk      = null
         network   = {}
+        mounts    = []
       },
 
       yamldecode(file("${path.module}/containers/${filepath}")),
@@ -34,10 +36,12 @@ module "lxc" {
 
   ssh_key   = local.deploy_public_key
   hostname  = each.key
+  id        = each.value.id
   tags      = each.value.tags
   template  = each.value.template
   distro    = each.value.distro
   resources = each.value.resources
   disk      = each.value.disk
   network   = each.value.network
+  mounts    = each.value.mounts
 }

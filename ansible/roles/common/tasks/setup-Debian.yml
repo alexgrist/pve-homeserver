@@ -17,7 +17,6 @@
 - name: Install baseline packages
   ansible.builtin.apt:
     name:
-      - apt-transport-https
       - python3-debian
       - gnupg2
     state: present

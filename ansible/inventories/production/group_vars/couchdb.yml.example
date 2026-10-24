@@ -1,3 +1,4 @@
 ---
-# Copy to group_vars/secrets.yml and encrypt it with ansible-vault.
+# Copy to group_vars/all/secrets.yml and encrypt it with ansible-vault.
 couchdb_admin_password: "replace-this-with-a-vaulted-value"
+couchdb_cookie: "replace-this-with-a-vaulted-value"

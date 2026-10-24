@@ -16,7 +16,9 @@ locals {
 
 resource "proxmox_virtual_environment_container" "this" {
   description = var.description
-  tags        = var.tags
+
+  # pve lowercases and sorts tags, so sort here to avoid reporting drift
+  tags = sort(concat(var.tags, var.extra_tags))
 
   node_name = var.pve.node
   vm_id     = var.id

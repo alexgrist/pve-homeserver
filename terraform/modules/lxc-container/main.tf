@@ -1,5 +1,9 @@
 
+# tags version a container for replacement; a protected container gets no
+# instances here, so its replace_triggered_by reference stays empty
 resource "terraform_data" "tags_version" {
+  count = var.protection ? 0 : 1
+
   input = sort(var.tags)
 }
 
@@ -18,8 +22,15 @@ resource "proxmox_virtual_environment_container" "this" {
   description = var.description
   tags        = var.tags
 
+  # pve protection prevents the container and its data volumes from being
+  # destroyed by terraform and stray pct calls
+  protection = var.protection
+
   node_name = var.pve.node
   vm_id     = var.id
+
+  started       = var.started
+  start_on_boot = var.start_on_boot
 
   # newer linux distributions require unprivileged user namespaces
   unprivileged = true
@@ -88,7 +99,8 @@ resource "proxmox_virtual_environment_container" "this" {
   }
 
   lifecycle {
-    # tags drive ansible role targeting, so recreate instead of updating stale tags
+    # tags drive ansible role targeting, so recreate instead of updating stale tags;
+    # protected containers are exempt, keeping their data mount points in place
     replace_triggered_by = [terraform_data.tags_version]
 
     precondition {
@@ -99,6 +111,16 @@ resource "proxmox_virtual_environment_container" "this" {
     precondition {
       condition     = var.distro != null && var.distro != ""
       error_message = "'${var.distro}' container definition must have a distro."
+    }
+
+    precondition {
+      condition     = !var.data_tier || (!var.started && !var.start_on_boot)
+      error_message = "A data tier container must not start, keeping its volumes unmounted for the consumers."
+    }
+
+    precondition {
+      condition     = !var.data_tier || var.protection
+      error_message = "A data tier container must be protected; releasing the protection is a deliberate change."
     }
   }
 }

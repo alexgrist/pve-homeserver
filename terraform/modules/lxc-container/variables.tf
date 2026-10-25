@@ -34,6 +34,30 @@ variable "hostname" {
   type        = string
 }
 
+variable "protection" {
+  description = "Whether to enable pve protection for the container"
+  type        = bool
+  default     = false
+}
+
+variable "data_tier" {
+  description = "Whether the container owns data volumes for other containers instead of running services"
+  type        = bool
+  default     = false
+}
+
+variable "started" {
+  description = "Whether to start the container"
+  type        = bool
+  default     = true
+}
+
+variable "start_on_boot" {
+  description = "Whether to start the container when the host boots"
+  type        = bool
+  default     = true
+}
+
 variable "ssh_key" {
   description = "The SSH public key used to access the container"
   type        = string

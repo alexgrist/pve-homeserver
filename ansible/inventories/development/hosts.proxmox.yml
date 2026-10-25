@@ -9,10 +9,11 @@ keyed_groups:
     prefix: ""
     separator: ""
 
-# Filter hosts belonging to dev
+# Filter hosts belonging to dev and containers that are not running
 filters:
   - proxmox_vmtype == "lxc"
   - "'dev' in proxmox_tags_parsed"
+  - proxmox_status == "running"
 
 compose:
   ansible_connection: "'community.proxmox.proxmox_pct_remote'"

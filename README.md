@@ -22,6 +22,8 @@ Containers are YAML files under `<environment>/containers`. Ansible roles are ap
 
 Role tags apply ansible roles and, along with a hashed tags version, replace the container on tag churn so the rootfs stays aligned with the roles. Descriptive metadata tags are set via `extra_tags`, are never part of that hash, and update in place when changed.
 
+A stopped storage tier container (`storage`) owns the data volumes stateful containers mount, so those containers can be replaced freely by tag churn while their data persists. The tier itself is protected (`protection: true`) and excluded from tag churn replacement.
+
 ## Ansible
 
 Playbooks live in `ansible/playbooks/`, inventories under `ansible/inventories/`. Hosts are grouped by Proxmox tags, roles matching those tags are applied on top of the shared common role. A container tagged `couchdb` gets the `couchdb` role automatically. The vault password (if provided) is fetched from 1Password at run time.

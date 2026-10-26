@@ -1,0 +1,13 @@
+# the storage tier: a stopped container owning the block volumes stateful
+# containers mount, like ebs volumes detached from instances. its vzdump
+# job covers every volume it owns; volumes are mounted elsewhere, one of
+# them at a time. release the protection deliberately before removing it.
+data_tier: true
+id: 701
+protection: true
+template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+distro: "debian"
+disk:
+  size: 2
+started: false
+start_on_boot: false

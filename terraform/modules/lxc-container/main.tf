@@ -1,5 +1,7 @@
 
 resource "terraform_data" "tags_version" {
+  count = var.protection ? 0 : 1
+
   input = sort(var.tags)
 }
 
@@ -11,6 +13,7 @@ locals {
       index = index
       idmap = mount.idmap
     }
+    if mount.idmap != null
   ]
 }
 
@@ -20,8 +23,15 @@ resource "proxmox_virtual_environment_container" "this" {
   # pve lowercases and sorts tags, so sort here to avoid reporting drift
   tags = sort(concat(var.tags, var.extra_tags))
 
+  # pve protection prevents the container and its data volumes from being
+  # destroyed by terraform and stray pct calls
+  protection = var.protection
+
   node_name = var.pve.node
   vm_id     = var.id
+
+  started       = var.started
+  start_on_boot = var.start_on_boot
 
   # newer linux distributions require unprivileged user namespaces
   unprivileged = true
@@ -90,17 +100,24 @@ resource "proxmox_virtual_environment_container" "this" {
   }
 
   lifecycle {
-    # tags drive ansible role targeting, so recreate instead of updating stale tags
+    # tags drive ansible role targeting, so a role change recreates the
+    # container instead of updating stale tags on a provisioned filesystem;
+    # protected containers keep their mounts and update tags in place
     replace_triggered_by = [terraform_data.tags_version]
 
     precondition {
-      condition     = var.template != null && var.template != ""
-      error_message = "'${var.hostname}' container definition must have a template."
+      condition     = !var.data_tier || var.id != null
+      error_message = "A data tier container must pin its ID; PVE volume names encode it."
     }
 
     precondition {
-      condition     = var.distro != null && var.distro != ""
-      error_message = "'${var.distro}' container definition must have a distro."
+      condition     = !var.data_tier || (!var.started && !var.start_on_boot)
+      error_message = "A data tier container must not start, keeping its volumes unmounted for the consumers."
+    }
+
+    precondition {
+      condition     = !var.data_tier || var.protection
+      error_message = "A data tier container must be protected; releasing the protection is a deliberate change."
     }
   }
 }
@@ -108,7 +125,9 @@ resource "proxmox_virtual_environment_container" "this" {
 # mount point idmap is not exposed by the provider, so it is reconciled through
 # the API using the same credentials the provider reads from the environment
 resource "terraform_data" "mount_idmap" {
-  count = length(local.mount_idmap) > 0 ? 1 : 0
+  # the reconciler restarts the container, so it never runs on a container
+  # that must stay stopped, like a data tier owner
+  count = var.started && length(local.mount_idmap) > 0 ? 1 : 0
 
   triggers_replace = [
     sha256(jsonencode(local.mount_idmap)),

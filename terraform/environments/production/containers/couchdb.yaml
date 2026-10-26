@@ -1,3 +1,6 @@
+tags:
+  - couchdb
+start_on_boot: true
 template: "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
 distro: "debian"
 resources:
@@ -7,3 +10,10 @@ disk:
   size: 8
 network:
   vlan: 10
+mounts:
+  # data lives on a volume owned by the storage tier, so this container is
+  # cattle: tag churn replaces it freely and the data persists. size and
+  # datastore are declared here; the tier's own vzdump job covers the volume
+  - path: "/opt/couchdb/data"
+    size: "20G"
+    owner: storage

@@ -6,8 +6,8 @@ locals {
       # base structure
       {
         id            = null
+        roles         = []
         tags          = []
-        extra_tags    = []
         template      = null
         distro        = null
         resources     = null
@@ -53,8 +53,8 @@ module "data_tier" {
 
   hostname      = each.key
   id            = each.value.id
+  roles         = each.value.roles
   tags          = each.value.tags
-  extra_tags    = each.value.extra_tags
   template      = each.value.template
   distro        = each.value.distro
   resources     = each.value.resources
@@ -84,8 +84,8 @@ module "lxc" {
 
   hostname      = each.key
   id            = each.value.id
+  roles         = each.value.roles
   tags          = each.value.tags
-  extra_tags    = each.value.extra_tags
   template      = each.value.template
   distro        = each.value.distro
   resources     = each.value.resources

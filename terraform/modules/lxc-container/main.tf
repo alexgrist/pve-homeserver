@@ -114,6 +114,11 @@ resource "proxmox_virtual_environment_container" "this" {
     }
 
     precondition {
+      condition     = !var.data_tier || var.id != null
+      error_message = "A data tier container must pin its ID; PVE volume names encode it."
+    }
+
+    precondition {
       condition     = !var.data_tier || (!var.started && !var.start_on_boot)
       error_message = "A data tier container must not start, keeping its volumes unmounted for the consumers."
     }

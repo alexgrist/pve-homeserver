@@ -20,6 +20,8 @@ Terraform + Ansible for my Proxmox homelab. Terraform creates the LXC containers
 Two environments live under `terraform/environments/` each with its own state, variables, and container definitions.
 Containers are YAML files under `<environment>/containers`. Ansible roles are applied based on Proxmox tags.
 
+Role tags apply ansible roles and, along with a hashed tags version, replace the container on tag churn so the rootfs stays aligned with the roles. Descriptive metadata tags are set via `extra_tags`, are never part of that hash, and update in place when changed.
+
 ## Ansible
 
 Playbooks live in `ansible/playbooks/`, inventories under `ansible/inventories/`. Hosts are grouped by Proxmox tags, roles matching those tags are applied on top of the shared common role. A container tagged `couchdb` gets the `couchdb` role automatically. The vault password (if provided) is fetched from 1Password at run time.

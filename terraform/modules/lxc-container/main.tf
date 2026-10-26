@@ -2,7 +2,7 @@
 resource "terraform_data" "tags_version" {
   count = var.protection ? 0 : 1
 
-  input = sort(var.tags)
+  input = sort(var.roles)
 }
 
 locals {
@@ -21,7 +21,8 @@ resource "proxmox_virtual_environment_container" "this" {
   description = var.description
 
   # pve lowercases and sorts tags, so sort here to avoid reporting drift
-  tags = sort(concat(var.tags, var.extra_tags))
+  # roles also arrive on the box as tags, driving the ansible role lookup
+  tags = sort(concat(var.roles, var.tags))
 
   # pve protection prevents the container and its data volumes from being
   # destroyed by terraform and stray pct calls
@@ -100,7 +101,7 @@ resource "proxmox_virtual_environment_container" "this" {
   }
 
   lifecycle {
-    # tags drive ansible role targeting, so a role change recreates the
+    # roles drive ansible role targeting, so a role change recreates the
     # container instead of updating stale tags on a provisioned filesystem;
     # protected containers keep their mounts and update tags in place
     replace_triggered_by = [terraform_data.tags_version]

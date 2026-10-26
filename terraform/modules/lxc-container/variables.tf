@@ -23,28 +23,28 @@ variable "description" {
   default     = "Managed by Terraform"
 }
 
-variable "tags" {
-  description = "The role tags associated with the container"
+variable "roles" {
+  description = "The ansible roles the container is tagged for"
   type        = list(string)
   default     = []
 }
 
-variable "extra_tags" {
+variable "tags" {
   description = "The descriptive tags that never drive container replacement"
   type        = list(string)
   default     = []
 
   validation {
     condition = alltrue([
-      for tag in var.extra_tags :
+      for tag in var.tags :
       tag == lower(tag) && can(regex("^[a-z0-9][a-z0-9_-]*$", tag))
     ])
-    error_message = "Extra tags must be lowercase alphanumerics, or contain - and _."
+    error_message = "Descriptive tags must be lowercase alphanumerics, or contain - and _."
   }
 
   validation {
-    condition     = length(setintersection(var.tags, var.extra_tags)) == 0
-    error_message = "Extra tags must not duplicate role tags."
+    condition     = length(setintersection(var.roles, var.tags)) == 0
+    error_message = "Descriptive tags must not duplicate roles."
   }
 }
 

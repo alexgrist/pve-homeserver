@@ -1,6 +1,25 @@
 # pve-homeserver
 
+[![Ansible CI](https://github.com/alexgrist/pve-homeserver/actions/workflows/ansible-ci.yml/badge.svg)](https://github.com/alexgrist/pve-homeserver/actions/workflows/ansible-ci.yml)
+[![Terraform CI](https://github.com/alexgrist/pve-homeserver/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/alexgrist/pve-homeserver/actions/workflows/terraform-ci.yml)
+[![Repository lint](https://github.com/alexgrist/pve-homeserver/actions/workflows/lint.yml/badge.svg)](https://github.com/alexgrist/pve-homeserver/actions/workflows/lint.yml)
+
 Terraform + Ansible for my Proxmox homelab. Terraform creates the LXC containers, Ansible configures them.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    op[op CLI] --> compose[docker compose]
+    compose --> tofu[tofu container]
+    compose --> ansible[ansible container]
+    tofu -->|api| pve[(Proxmox VE)]
+    ansible -->|ssh and pct| pve
+    tofu ---|creates and tags containers| pve
+    pve -->|tags resolve roles| ansible
+```
+
+Terraform owns the lifecycle, Ansible owns the configuration for anything running. The handover between them is tags: containers are tagged with their purpose, and Ansible applies the role that matches each tag. 1Password is the source for api tokens, vault and connection credentials, and neither toolchain reads them off disk.
 
 ## Prerequisites:
 
@@ -26,6 +45,8 @@ Playbooks live in `ansible/playbooks/`, inventories under `ansible/inventories/`
 
 ## Usage
 
+Terraform and Ansible run through the compose toolchains, wrapped in an op session with `OP_ENV` (`--environment=<op_env_id>`, `OP_SERVICE_ACCOUNT_TOKEN` still needs to be in the shell).
+
 ### Terraform
 
 ```powershell
@@ -48,6 +69,11 @@ op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-inve
 # push the development playbook
 op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-playbook -i inventories/development/hosts.proxmox.yml playbooks/development.yml
 
+# push the site playbook
+op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-playbook -i inventories/production/hosts.proxmox.yml playbooks/site.yml
+
 # run the local test playbook (in local container)
 op run --environment=<op_env_id> -- docker compose run --rm ansible ansible-playbook -i inventories/development/local.yml playbooks/local.yml
 ```
+
+On Linux, the same commands are wrapped as make targets (see `make help`): `tf-init`, `tf-plan OP_ENV=...`, `tf-apply OP_ENV=...`, `inventory`, `playbook`, `playbook ANSIBLE_ENV=production`, `playbook-local`, and `build`.

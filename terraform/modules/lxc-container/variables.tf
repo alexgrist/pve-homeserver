@@ -65,8 +65,13 @@ variable "ssh_key" {
 }
 
 variable "template" {
-  description = "The template to use for the container"
+  description = "The OS template the container is created from"
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.template)) > 0
+    error_message = "The container definition must have a template."
+  }
 }
 
 variable "distro" {

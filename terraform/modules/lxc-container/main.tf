@@ -1,6 +1,4 @@
 
-# tags version a container for replacement; a protected container gets no
-# instances here, so its replace_triggered_by reference stays empty
 resource "terraform_data" "tags_version" {
   count = var.protection ? 0 : 1
 
@@ -15,6 +13,7 @@ locals {
       index = index
       idmap = mount.idmap
     }
+    if mount.idmap != null
   ]
 }
 
@@ -99,19 +98,10 @@ resource "proxmox_virtual_environment_container" "this" {
   }
 
   lifecycle {
-    # tags drive ansible role targeting, so recreate instead of updating stale tags;
-    # protected containers are exempt, keeping their data mount points in place
+    # tags drive ansible role targeting, so a role change recreates the
+    # container instead of updating stale tags on a provisioned filesystem;
+    # protected containers keep their mounts and update tags in place
     replace_triggered_by = [terraform_data.tags_version]
-
-    precondition {
-      condition     = var.template != null && var.template != ""
-      error_message = "'${var.hostname}' container definition must have a template."
-    }
-
-    precondition {
-      condition     = var.distro != null && var.distro != ""
-      error_message = "'${var.distro}' container definition must have a distro."
-    }
 
     precondition {
       condition     = !var.data_tier || var.id != null
@@ -133,7 +123,9 @@ resource "proxmox_virtual_environment_container" "this" {
 # mount point idmap is not exposed by the provider, so it is reconciled through
 # the API using the same credentials the provider reads from the environment
 resource "terraform_data" "mount_idmap" {
-  count = length(local.mount_idmap) > 0 ? 1 : 0
+  # the reconciler restarts the container, so it never runs on a container
+  # that must stay stopped, like a data tier owner
+  count = var.started && length(local.mount_idmap) > 0 ? 1 : 0
 
   triggers_replace = [
     sha256(jsonencode(local.mount_idmap)),

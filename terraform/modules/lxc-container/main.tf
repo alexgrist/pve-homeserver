@@ -19,7 +19,9 @@ locals {
 
 resource "proxmox_virtual_environment_container" "this" {
   description = var.description
-  tags        = var.tags
+
+  # pve lowercases and sorts tags, so sort here to avoid reporting drift
+  tags = sort(concat(var.tags, var.extra_tags))
 
   # pve protection prevents the container and its data volumes from being
   # destroyed by terraform and stray pct calls

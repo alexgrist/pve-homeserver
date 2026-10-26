@@ -7,6 +7,7 @@ locals {
       {
         id            = null
         tags          = []
+        extra_tags    = []
         template      = null
         distro        = null
         resources     = null
@@ -53,6 +54,7 @@ module "data_tier" {
   hostname      = each.key
   id            = each.value.id
   tags          = each.value.tags
+  extra_tags    = each.value.extra_tags
   template      = each.value.template
   distro        = each.value.distro
   resources     = each.value.resources
@@ -83,6 +85,7 @@ module "lxc" {
   hostname      = each.key
   id            = each.value.id
   tags          = each.value.tags
+  extra_tags    = each.value.extra_tags
   template      = each.value.template
   distro        = each.value.distro
   resources     = each.value.resources

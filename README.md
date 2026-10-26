@@ -20,6 +20,8 @@ Terraform + Ansible for my Proxmox homelab. Terraform creates the LXC containers
 Two environments live under `terraform/environments/` each with its own state, variables, and container definitions.
 Containers are YAML files under `<environment>/containers`. Ansible roles are applied based on Proxmox tags.
 
+Role tags apply ansible roles and, along with a hashed tags version, replace the container on tag churn so the rootfs stays aligned with the roles. Descriptive metadata tags are set via `extra_tags`, are never part of that hash, and update in place when changed.
+
 A stopped storage tier container (`storage`) owns the data volumes stateful containers mount, so those containers can be replaced freely by tag churn while their data persists. The tier itself is protected (`protection: true`) and excluded from tag churn replacement.
 
 ## Ansible

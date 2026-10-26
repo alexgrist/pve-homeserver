@@ -16,14 +16,6 @@
 
   tasks:
     - name: Dynamically include roles matching tags
-      ansible.builtin.include_role:
-        name: "{{ proxmox_tag }}"
-      loop: "{{ proxmox_tags_parsed | reject('eq', 'dev') | list }}"
-      loop_control:
-        loop_var: proxmox_tag
-        label: "{{ proxmox_tag }}"
-      when: >-
-        query('ansible.builtin.first_found',
-          [proxmox_tag ~ '/tasks/main.yml'],
-          paths=role_search_paths,
-          skip=True) | length > 0
+      ansible.builtin.import_tasks: tasks/tagged-roles.yml
+      vars:
+        proxmox_tags: "{{ proxmox_tags_parsed | reject('eq', 'dev') | list }}"

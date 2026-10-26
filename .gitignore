@@ -29,3 +29,6 @@ $RECYCLE.BIN/
 .env
 .env.local
 .env.*.local
+
+### Local python virtual environments
+.venv/
